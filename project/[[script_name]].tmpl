@@ -1,0 +1,68 @@
+#!/bin/bash
+# [[ script_name ]]
+set -e 
+set -u
+
+info () { echo "[INFO]" $* ; }
+
+has_binary () { command -v $1 > /dev/null || (echo "Please install $1" ; exit 1 ); }
+
+check_dependencies () {
+    for binary in $* ; do
+        has_binary $binary
+    done
+}
+
+
+usage () {
+    cat <<.
+Usage: $(basename $0) [-c DIR]
+    -h,--help           Show this message and exit.
+    -c,--conf-dir=DIR   Configuration directory
+.
+}
+
+parse_opts () {
+    tempopt=$(getopt --name $(basename $0) \
+                -o u,h,c: \
+                -l usage,help,conf-dir: \
+                    -- "$@")
+    # Finishes if received some unknown option.
+    if [ $? != 0 ] ; then usage && exit 1 ; fi
+
+    eval set -- "$tempopt"
+
+    CONF_DIR="~/.config/[[ script_name ]]"         # Default value.
+
+    # Parse named options.
+    while true ; do
+        case "$1" in
+            -u|--usage|-h|--help) usage && exit ;;
+            -c|--conf-dir) CONF_DIR=$2 ; shift 2 ;;
+            --) shift ; break ;;
+            *) echo "Internal error!" >&2 ; exit 1 ;;
+        esac
+    done
+
+    # Parse arguments.
+    if [ $# != 0 ] ; then usage && exit 1 ; fi
+    if [ -z "${CONF_DIR}" ] ; then usage && exit 1 ; fi 
+}
+
+
+
+check_dependencies getopt
+
+parse_opts "$@"
+
+[% if creates_tmp_file == "yes" -%]
+check_dependencies mktemp
+
+# Creates temporary file.
+TMP_OUT=$(mktemp --suffix .tmp.[[ script_name ]].$(date -I))
+# Removes temp file at the end or on kill.
+trap "rm -rf ${TMP_OUT} ; exit" INT TERM EXIT
+[% endif %]
+
+
+exit 0

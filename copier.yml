@@ -1,0 +1,12 @@
+_subdirectory: project
+
+script_name:
+  type: str
+  default: "script.sh"
+
+creates_tmp_file:
+  type: bool
+  default: yes
+  help: Add code to manage a temporary file?
+
+
