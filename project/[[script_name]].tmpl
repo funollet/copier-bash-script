@@ -50,12 +50,11 @@ parse_opts () {
 }
 
 
-
 check_dependencies getopt
 
 parse_opts "$@"
 
-[% if creates_tmp_file == "yes" -%]
+[% if creates_tmp_file -%]
 check_dependencies mktemp
 
 # Creates temporary file.
