@@ -1,5 +1,5 @@
 #!/bin/bash
-# [[ script_name ]]
+# {{ script_name }}
 set -e 
 set -u
 
@@ -32,7 +32,7 @@ parse_opts () {
 
     eval set -- "$tempopt"
 
-    CONF_DIR="~/.config/[[ script_name ]]"         # Default value.
+    CONF_DIR="~/.config/{{ script_name }}"         # Default value.
 
     # Parse named options.
     while true ; do
@@ -54,14 +54,14 @@ check_dependencies getopt
 
 parse_opts "$@"
 
-[% if creates_tmp_file -%]
+{% if creates_tmp_file -%}
 check_dependencies mktemp
 
 # Creates temporary file.
-TMP_OUT=$(mktemp --suffix .tmp.[[ script_name ]].$(date -I))
+TMP_OUT=$(mktemp --suffix .tmp.{{ script_name }}.$(date -I))
 # Removes temp file at the end or on kill.
 trap "rm -rf ${TMP_OUT} ; exit" INT TERM EXIT
-[% endif %]
+{% endif %}
 
 
 exit 0
